@@ -36,7 +36,7 @@ regresshion-check --individual 128.227.162.32
 
 ### Scan Multiple IP Addresses from a File
 
-To scan multiple IP addresses listed in a file, use the `--file
+To scan multiple IP addresses listed in a file, use the `--file` option followed by the input file:
 
 Example file contents:
 ```
@@ -48,6 +48,10 @@ Example usage:
 ```sh
 regresshion-check --file /path/to/file/here.txt
 ```
+
+### Scanning Batch Size
+
+The scanning job batches based half of the current ulimit size. If you would like this application to run faster when doing larger CIDRs/lists, raise the ulimit. Example: `ulimit -n 8192`
 
 ### Example Output
 ```

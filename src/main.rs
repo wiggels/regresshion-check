@@ -11,6 +11,7 @@ use tokio::task;
 use tokio::time::{timeout, Duration};
 use tokio::io::AsyncBufReadExt;
 use dns_lookup::lookup_addr;
+use libc::{rlimit, RLIMIT_NOFILE, getrlimit};
 
 #[derive(Serialize, Default)]
 struct ScanResult {
@@ -74,7 +75,7 @@ async fn scan_ip(ip: Arc<String>, scan_result: Arc<Mutex<ScanResult>>) {
     };
 
     let stream: tokio::net::TcpStream = match timeout(
-        Duration::new(2, 0),
+        Duration::new(3, 0),
         tokio::net::TcpStream::connect(&socket_addr),
     )
     .await
@@ -90,7 +91,7 @@ async fn scan_ip(ip: Arc<String>, scan_result: Arc<Mutex<ScanResult>>) {
     let mut reader: tokio::io::BufReader<tokio::net::TcpStream> = tokio::io::BufReader::new(stream);
     let mut version: String = String::new();
 
-    match timeout(Duration::new(1, 0), reader.read_line(&mut version)).await {
+    match timeout(Duration::new(3, 0), reader.read_line(&mut version)).await {
         Ok(Ok(_)) => {
             version = version.trim().to_string();
             let hostname: String = get_hostname(&socket_addr.ip()).unwrap_or_else(|| "Unknown".to_string());
@@ -135,11 +136,15 @@ async fn scan_file(file_path: &str, scan_result: Arc<Mutex<ScanResult>>) -> io::
         }
     }
 
+    let ulimit: usize = get_ulimit();
+    let max_tasks: usize = ulimit / 2;
+    println!("Batching {} at a time based on current ulimit.", max_tasks);
+
     let mut handles: Vec<task::JoinHandle<()>> = vec![];
     for ip in ips {
         let handle: task::JoinHandle<()> = task::spawn(scan_ip(ip.clone(), scan_result.clone()));
         handles.push(handle);
-        if handles.len() == 200 {
+        if handles.len() == max_tasks {
             for handle in handles {
                 handle.await.unwrap();
             }
@@ -147,12 +152,21 @@ async fn scan_file(file_path: &str, scan_result: Arc<Mutex<ScanResult>>) -> io::
         }
     }
 
-    // Process any remaining handles if less than 200 IPs
+    // Process any remaining handles if less than batch size
     for handle in handles {
         handle.await.unwrap();
     }
 
     Ok(())
+}
+
+fn get_ulimit() -> usize {
+    let mut limit: rlimit = unsafe { std::mem::zeroed() };
+    if unsafe { getrlimit(RLIMIT_NOFILE, &mut limit) } == 0 {
+        limit.rlim_cur as usize
+    } else {
+        1024
+    }
 }
 
 fn get_hostname(ip: &IpAddr) -> Option<String> {
