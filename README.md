@@ -2,6 +2,8 @@
 
 `regresshion-check` is a Rust CLI tool to check SSH servers for vulnerability to CVE-2024-6387. It takes in a single IP or multiple IPs/CIDRs separated by newlines in a file. It includes the reverse DNS lookup and version string with any IPs detected as vulnerable.
 
+(IPs listed in readme are examples only -- do not use)
+
 ## Prerequisites
 
 - Rust and Cargo installed. You can install Rust and Cargo using [rustup](https://rustup.rs/).
@@ -31,7 +33,7 @@ regresshion-check --individual <ip-address>
 
 Example usage:
 ```sh
-regresshion-check --individual 128.227.162.32
+regresshion-check --individual 215.227.162.32
 ```
 
 ### Scan Multiple IP Addresses from a File
@@ -40,8 +42,8 @@ To scan multiple IP addresses listed in a file, use the `--file` option followed
 
 Example file contents:
 ```
-128.227.64.0/24
-128.227.162.32
+215.227.64.0/24
+215.227.162.32
 ```
 
 Example usage:
@@ -61,13 +63,13 @@ The scanning job batches based half of the current ulimit size. If you would lik
   "vulnerable": 2,
   "vulnerable_ips": [
     {
-      "ip": "128.227.162.32",
-      "hostname": "elaine.cise.ufl.edu",
+      "ip": "215.227.162.32",
+      "hostname": "some.server.somewhere.com",
       "version": "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.7"
     },
     {
-      "ip": "128.227.64.156",
-      "hostname": "hydra06.phys.ufl.edu",
+      "ip": "215.227.64.156",
+      "hostname": "another.server.somewhere.com",
       "version": "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.7"
     }
   ]
