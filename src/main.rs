@@ -137,7 +137,7 @@ async fn scan_file(file_path: &str, scan_result: Arc<Mutex<ScanResult>>) -> io::
     }
 
     let ulimit: usize = get_ulimit();
-    let max_tasks: usize = ulimit / 2;
+    let max_tasks: usize = ulimit - 64;
     eprintln!("Batching {} at a time based on current ulimit.", max_tasks);
 
     let mut handles: Vec<task::JoinHandle<()>> = vec![];
