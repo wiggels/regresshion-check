@@ -53,7 +53,7 @@ regresshion-check --file /path/to/file/here.txt
 
 ### Scanning Batch Size
 
-The scanning job batches based half of the current ulimit size. If you would like this application to run faster when doing larger CIDRs/lists, raise the ulimit. Example: `ulimit -n 8192`
+The scanning job batches based on the current ulimit size minus a buffer of 64. If you would like this application to run faster when doing larger CIDRs/lists, raise the ulimit. Example: `ulimit -n 8192`
 
 ### Example Output
 ```
