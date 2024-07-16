@@ -220,7 +220,8 @@ fn is_vulnerable(version: &str) -> bool {
                     && ssh_minor == 9
                     && ssh_patch >= 1
                     && upstream_patch >= 3
-                    && ubuntu_patch >= 10)
+                    && ubuntu_patch >= 0
+                    && ubuntu_subpatch >= 10)
                     || (ssh_major == 9
                         && ssh_minor == 3
                         && ssh_patch >= 1
